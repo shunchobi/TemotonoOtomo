@@ -160,6 +160,14 @@ extension MPCSession: MCSessionDelegate {
     ///
     /// send メソッドから送られてきたDataをここで受け取る
     ///
+    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+        if let imageData = Data(base64Encoded: responseString, options: []) {
+            let image = UIImage(data: imageData) // --> これを表示する
+            self.currentScreenImage = image
+        }
+    }
+    
 //    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
 //
 //        // data -> UIImage
@@ -174,13 +182,7 @@ extension MPCSession: MCSessionDelegate {
 //            log.info("didReceive invalid value \(data.count) bytes")
 //        }
 //    }
-    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
-        if let imageData = Data(base64Encoded: responseString, options: []) {
-            let image = UIImage(data: imageData) // --> これを表示する
-            self.currentScreenImage = image
-        }
-    }
+  
 
 
     public func session(_ session: MCSession, didStartReceivingResourceWithName resourceName: String, fromPeer peerID: MCPeerID, with progress: Progress) {
