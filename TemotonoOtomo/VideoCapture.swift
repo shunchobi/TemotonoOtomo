@@ -13,6 +13,7 @@ class VideoCapture: NSObject {
     let captureSession = AVCaptureSession()
     var handler: ((CMSampleBuffer) -> Void)?
 
+
     override init() {
         super.init()
         setup()
@@ -64,7 +65,7 @@ class VideoCapture: NSObject {
 extension VideoCapture: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         if let handler = handler {
-            handler(sampleBuffer)
+            handler(sampleBuffer) // Heavy Process
         }
     }
 }

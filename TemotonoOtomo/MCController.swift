@@ -74,17 +74,17 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
 //                }
 //            }
 //       }
-        
-        if let imageData = screenImage.jpegData(compressionQuality: 0.0) {
+        print("cached called")
+        if let imageData = screenImage.jpegData(compressionQuality: 0.1) { // heavy
+            print("success encode to jpeg Data")
             let encodeString:String = imageData.base64EncodedString(options: [])
-            let data = encodeString.data(using: .utf8) // --> これを配信する
+            let data: Data? = encodeString.data(using: .utf8) // --> これを配信する
             do {
-                try session.send(data!, toPeers: session.connectedPeers, with: .reliable)
+                try session.send(data!, toPeers: session.connectedPeers, with: .unreliable)
             } catch {
                 log.error("Error for sending: \(String(describing: error))")
             }
         }
-
         
     }
 }
@@ -161,13 +161,16 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+//        currentScreenImage = nil
+        print("recieve image")
         let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
         if let imageData = Data(base64Encoded: responseString, options: []) {
-            let image = UIImage(data: imageData) // --> これを表示する
+            print("success Encoded")
+            let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
             self.currentScreenImage = image
         }
     }
-    
+        
 //    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
 //
 //        // data -> UIImage
