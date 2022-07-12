@@ -43,43 +43,44 @@ struct ContentView: View {
         }
     }
     
-//    //非同期スレッドの作成
-//        DispatchQueue(label: "my.async").async {
-//            //ここで非同期でのメイン処理をする
-//            //do something
-//
-//            //非同期スレッドの中に後処理でしたいものを入れる。
-//            //ここでは画面描画の処理をしたいのでメインスレッドで動くように指定している。
-//            DispatchQueue.main.sync {
-//                    self.didCount += 1
-//                    self.progressBar.doubleValue = Double(self.didCount)
-//                    self.btnRedraw(self)
-//                    self.tableview.reloadData()
-//                }
-//            })
-//
-    
-
     func DisplayCamera(){
         videoCapture.run { sampleBuffer in
-
-            if let convertImage = UIImageFromSampleBuffer(sampleBuffer) { // Heavy Process
-//            if let convertImage = getScreenImageData(sampleBuffer) { // fail
-//            if let convertImage = imageFromSampleBuffer(sampleBuffer) { // fail
-//                if let convertImage = GetStringAsConveredSampleBufferImage(sampleBuffer) { // fail
-                DispatchQueue.main.async {
-//                        self.image = convertImageß
-//                        if let image = self.image{
-//                            print("call send func")
-                    if let imageData = convertImage.jpegData(compressionQuality: 0.1) { // heavy
-                        let encodeString:String = imageData.base64EncodedString(options: [])
-                        let data: Data? = encodeString.data(using: .utf8) // --> これを配信する
-                            mpcSession.send(imageData: data)
+            // ここをDispatchQueue.main.asyncにしてしまえば、リアルタイム感は増すが、
+            // ライブビデオ映像のクオリティはデバイススペックに依存する。
+            // DispatchQueue.global(qos: .userInteractive).asyncだと、比較的滑らかな映像だが、
+            // デバイススペックが低いと反応が遅くリアルタイムな通信感はなくなる。
+            DispatchQueue.global(qos: .userInteractive).async {
+                if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer) {
+                    DispatchQueue.main.async {
+                        mpcSession.send(imageData: imageData)
                     }
                 }
-        }
+            }
         }
     }
+    
+//    let ciImage = CIImage(cvImageBuffer: pixelBuffer)
+//    let ciContext = CIContext()
+//    guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
+//    let image = UIImage(cgImage: cgImage)
+    
+    func GetUIImageDataFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> Data? {
+        if let pixelBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+            let ciImage = CIImage(cvPixelBuffer: pixelBuffer) // Heavy Process .resize(to: 0.5) -> change size
+//            let imageRect = CGRect(x: 0, y: 0,
+//                                   width: CVPixelBufferGetWidth(pixelBuffer),
+//                                   height: CVPixelBufferGetHeight(pixelBuffer))
+            let context = CIContext()
+            if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) { //imageRectが２つ目の引数に入れられる
+                let uiImage = UIImage(cgImage: cgImage)
+                let imageData = uiImage.jpegData(compressionQuality: 0.1)
+                return imageData
+            }
+        }
+        return nil
+    }
+    
+    
     
     
     func GetStringAsConveredSampleBufferImage(_ sampleBuffer: CMSampleBuffer) -> String? {
@@ -93,29 +94,7 @@ struct ContentView: View {
         
         return data
     }
-    
 
-    func UIImageFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> UIImage? {
-//        if let dataBuffer: CMBlockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) {
-        if let pixelBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
-            let ciImage = CIImage(cvPixelBuffer: pixelBuffer) // Heavy Process
-            
-//            guard let resizedCiImage = ciImage.resize(to: 0.5) else{
-//                return nil
-//            }
-            
-            let imageRect = CGRect(x: 0, y: 0, width: CVPixelBufferGetWidth(pixelBuffer), height: CVPixelBufferGetHeight(pixelBuffer))
-            let context = CIContext()
-            if let image = context.createCGImage(ciImage, from: imageRect) {
-                return UIImage(cgImage: image)
-            }
-        }
-        return nil
-    }
-    
-
-    
-    
     func getScreenImageData(_ sampleBuffer: CMSampleBuffer) -> UIImage? {
         
 //        guard let colorSpace = UIImageFromSampleBuffer(sampleBuffer)!.cgImage!.colorSpace else {return nil}

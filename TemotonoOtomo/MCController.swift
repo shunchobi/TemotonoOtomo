@@ -51,17 +51,13 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     ///
     /// Advertiser はViewからここで入力値を受け取る
     ///
-    func send(imageData: Data?) { // UIImage
+    func send(imageData: Data) { // UIImage
         precondition(Thread.isMainThread)
-
-        //
-        // used send func
-        //
-      do {
-          try session.send(imageData!, toPeers: session.connectedPeers, with: .unreliable)
-      } catch {
-          log.error("Error for sending: \(String(describing: error))")
-      }
+        do {
+            try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
+        } catch {
+            log.error("Error for sending: \(String(describing: error))")
+        }
     }
 }
 
@@ -145,11 +141,8 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        
         DispatchQueue.main.async {
-            let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
-            if let imageData = Data(base64Encoded: responseString, options: []) {
-                let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
+            if let image = UIImage(data: data){
                 self.currentScreenImage = image
             }
         }
