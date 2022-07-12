@@ -24,6 +24,7 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     
     // test Date proparty
     @Published var currentScreenImage: UIImage? = nil
+    
 
     override init() {
         precondition(Thread.isMainThread)
@@ -50,42 +51,17 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     ///
     /// Advertiser はViewからここで入力値を受け取る
     ///
-    func send(screenImage: UIImage) {
+    func send(imageData: Data?) { // UIImage
         precondition(Thread.isMainThread)
-//        log.info("sendColor: \(String(describing: date)) to \(self.session.connectedPeers.count) peers")
-//        self.currentColor = date
-        
-//        self.currentScreenImage = screenImage
-        
-        // UIImage -> png
-//        image.pngData()
-        // UIImage -> jpeg
-        // compressionQualityには0~1の範囲で圧縮率を指定する
-//        image.jpegData(compressionQuality: 1)
-        
-//        let imageData: Data? = screenImage.pngData()
-//
-//        if let imageData: Data? = try! NSKeyedArchiver.archivedData(withRootObject: screenImage, requiringSecureCoding: false) {
-//            if !session.connectedPeers.isEmpty {
-//                do {
-//                    try session.send(imageData!, toPeers: session.connectedPeers, with: .reliable)
-//                } catch {
-//                    log.error("Error for sending: \(String(describing: error))")
-//                }
-//            }
-//       }
-        print("cached called")
-        if let imageData = screenImage.jpegData(compressionQuality: 0.1) { // heavy
-            print("success encode to jpeg Data")
-            let encodeString:String = imageData.base64EncodedString(options: [])
-            let data: Data? = encodeString.data(using: .utf8) // --> これを配信する
-            do {
-                try session.send(data!, toPeers: session.connectedPeers, with: .unreliable)
-            } catch {
-                log.error("Error for sending: \(String(describing: error))")
-            }
-        }
-        
+
+        //
+        // used send func
+        //
+      do {
+          try session.send(imageData!, toPeers: session.connectedPeers, with: .unreliable)
+      } catch {
+          log.error("Error for sending: \(String(describing: error))")
+      }
     }
 }
 
@@ -141,19 +117,27 @@ extension MPCSession: MCSessionDelegate {
     /// startStream メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-
+//        precondition(Thread.isMainThread)
+        print("recived streamName data")
         stream.delegate = self
         stream.schedule(in: .main, forMode: RunLoop.Mode.default)
         stream.open()
-
-        var data:Data?
-        let bufferSize = 1024
-        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
-        while stream.hasBytesAvailable {
-            let read = stream.read(buffer, maxLength: bufferSize)
-            data?.append(buffer, count: read)
+        
+        print("recived streamName data")
+        if let imageData = Data(base64Encoded: streamName, options: []) {
+            print("success encode streanName to data")
+            let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
+            self.currentScreenImage = image
         }
-        buffer.deallocate()
+
+//        var data:Data?
+//        let bufferSize = 1024
+//        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: bufferSize)
+//        while stream.hasBytesAvailable {
+//            let read = stream.read(buffer, maxLength: bufferSize)
+//            data?.append(buffer, count: read)
+//        }
+//        buffer.deallocate()
 
     }
 
@@ -161,13 +145,13 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-//        currentScreenImage = nil
-        print("recieve image")
-        let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
-        if let imageData = Data(base64Encoded: responseString, options: []) {
-            print("success Encoded")
-            let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
-            self.currentScreenImage = image
+        
+        DispatchQueue.main.async {
+            let responseString = NSString(data: data, encoding: String.Encoding.utf8.rawValue)! as String
+            if let imageData = Data(base64Encoded: responseString, options: []) {
+                let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
+                self.currentScreenImage = image
+            }
         }
     }
         

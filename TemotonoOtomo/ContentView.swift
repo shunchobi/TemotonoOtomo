@@ -24,7 +24,8 @@ struct ContentView: View {
     
     @StateObject var mpcSession: MPCSession = MPCSession()
     let videoCapture = VideoCapture()
-    @State var image: UIImage? = nil 
+    @State var image: UIImage? = nil
+    @State var testNum = 1
     
     var body: some View {
         VStack {
@@ -42,27 +43,60 @@ struct ContentView: View {
         }
     }
     
+//    //非同期スレッドの作成
+//        DispatchQueue(label: "my.async").async {
+//            //ここで非同期でのメイン処理をする
+//            //do something
+//
+//            //非同期スレッドの中に後処理でしたいものを入れる。
+//            //ここでは画面描画の処理をしたいのでメインスレッドで動くように指定している。
+//            DispatchQueue.main.sync {
+//                    self.didCount += 1
+//                    self.progressBar.doubleValue = Double(self.didCount)
+//                    self.btnRedraw(self)
+//                    self.tableview.reloadData()
+//                }
+//            })
+//
     
+
     func DisplayCamera(){
         videoCapture.run { sampleBuffer in
 
             if let convertImage = UIImageFromSampleBuffer(sampleBuffer) { // Heavy Process
 //            if let convertImage = getScreenImageData(sampleBuffer) { // fail
 //            if let convertImage = imageFromSampleBuffer(sampleBuffer) { // fail
+//                if let convertImage = GetStringAsConveredSampleBufferImage(sampleBuffer) { // fail
                 DispatchQueue.main.async {
-                    print("success get image data")
-//                        self.image = convertImage
+//                        self.image = convertImageß
 //                        if let image = self.image{
 //                            print("call send func")
-                            mpcSession.send(screenImage: convertImage)
-//                        }
+                    if let imageData = convertImage.jpegData(compressionQuality: 0.1) { // heavy
+                        let encodeString:String = imageData.base64EncodedString(options: [])
+                        let data: Data? = encodeString.data(using: .utf8) // --> これを配信する
+                            mpcSession.send(imageData: data)
+                    }
                 }
         }
         }
     }
     
+    
+    func GetStringAsConveredSampleBufferImage(_ sampleBuffer: CMSampleBuffer) -> String? {
+        let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
+        CVPixelBufferLockBaseAddress(imageBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+        let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer!)
+        let height = CVPixelBufferGetHeight(imageBuffer!)
+        let src_buff = CVPixelBufferGetBaseAddress(imageBuffer!)
+        let data = NSData(bytes: src_buff, length: bytesPerRow * height).base64EncodedString(options: [])
+        CVPixelBufferUnlockBaseAddress(imageBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+        
+        return data
+    }
+    
 
     func UIImageFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> UIImage? {
+//        if let dataBuffer: CMBlockBuffer = CMSampleBufferGetDataBuffer(sampleBuffer) {
         if let pixelBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let ciImage = CIImage(cvPixelBuffer: pixelBuffer) // Heavy Process
             
@@ -91,15 +125,17 @@ struct ContentView: View {
                 return nil
         }
         
-        // test for space color
-        let pixelBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
-        let ciImage = CIImage(cvPixelBuffer: pixelBuffer!) // Heavy Process
         
-        let uiImage: UIImage? = UIImageFromSampleBuffer(sampleBuffer)
+//        // test for space color
+//        let pixelBuffer: CVImageBuffer? = CMSampleBufferGetImageBuffer(sampleBuffer)
+//        let ciImage = CIImage(cvPixelBuffer: pixelBuffer!) // Heavy Process
+//
+//        let uiImage: UIImage? = UIImageFromSampleBuffer(sampleBuffer)
+//
+//        let colorspaces = CGColorSpace(name: CGColorSpace.sRGB)
+//        print("colorspaces = \(type(of: colorspaces))")
+//        //////////////
         
-        let colorspaces = CGColorSpace(name: CGColorSpace.sRGB)
-        print("colorspaces = \(type(of: colorspaces))")
-        //////////////
         
         CVPixelBufferLockBaseAddress(imageBuffer, CVPixelBufferLockFlags(rawValue: 0))
         guard let baseAddress: UnsafeMutableRawPointer = CVPixelBufferGetBaseAddressOfPlane(imageBuffer, 0) else {
