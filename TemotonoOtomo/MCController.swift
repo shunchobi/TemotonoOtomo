@@ -51,7 +51,7 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     ///
     /// Advertiser はViewからここで入力値を受け取る
     ///
-    func send(imageData: Data) { // UIImage
+    func send(imageData: Data) { // Data
         precondition(Thread.isMainThread)
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)

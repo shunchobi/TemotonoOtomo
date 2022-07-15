@@ -43,15 +43,25 @@ struct ContentView: View {
         }
     }
     
+    
+//    DispatchQueue.global().async {
+//        // yada yada something
+//        DispatchQueue.main.sync {
+//            // update UI
+//        }
+//        // this will happen only after 'update UI' has finished executing
+//    }
+    
+    
     func DisplayCamera(){
         videoCapture.run { sampleBuffer in
             // ここをDispatchQueue.main.asyncにしてしまえば、リアルタイム感は増すが、
             // ライブビデオ映像のクオリティはデバイススペックに依存する。
             // DispatchQueue.global(qos: .userInteractive).asyncだと、比較的滑らかな映像だが、
             // デバイススペックが低いと反応が遅くリアルタイムな通信感はなくなる。
-            DispatchQueue.global(qos: .userInteractive).async {
+            DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer) {
-                    DispatchQueue.main.async {
+                    DispatchQueue.main.sync {
                         mpcSession.send(imageData: imageData)
                     }
                 }
