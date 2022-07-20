@@ -3,12 +3,12 @@
 
 import SwiftUI
 import AVFoundation
+import Foundation
 
 
 
 extension CIImage{
     func resize(to scale: CGFloat) -> CIImage?{
-        print("from extension CIImage")
         guard let filter = CIFilter(name: "CILanczosScaleTransform") else{
             return nil
         }
@@ -19,13 +19,43 @@ extension CIImage{
     }
 }
 
+class AsyncToggle{
+    static var asyncISWorking = false
+}
+
+class Timer{
+    static func get(){
+        let date = Date()
+        let dateFormatter = DateFormatter()
+        dateFormatter.timeStyle = .full
+        let a = dateFormatter.string(from: date)
+        print(a)
+    }
+}
+
+class CommunicateCount: ObservableObject{
+    @Published var sentCount: Int = 0
+    @Published var recivedCount: Int = 0
+
+    func addSent(){
+        sentCount += 1
+        print(sentCount)
+    }
+    func addRecived(){
+        recivedCount += 1
+    }
+}
+
 
 struct ContentView: View {
     
     @StateObject var mpcSession: MPCSession = MPCSession()
     let videoCapture = VideoCapture()
     @State var image: UIImage? = nil
-    @State var testNum = 1
+    
+    var context = CIContext(options: nil)
+
+    @ObservedObject var communicateCount = CommunicateCount()
     
     var body: some View {
         VStack {
@@ -38,29 +68,22 @@ struct ContentView: View {
                 Button("share\nscreen") {
                     DisplayCamera()
                 }
+                
+                Text(String("sent count: \(mpcSession.sendCount)"))
+                Text(String("recived count: \(mpcSession.recivedCoount)"))
+                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+
             }
             .font(.largeTitle)
         }
+
     }
-    
-    
-//    DispatchQueue.global().async {
-//        // yada yada something
-//        DispatchQueue.main.sync {
-//            // update UI
-//        }
-//        // this will happen only after 'update UI' has finished executing
-//    }
-    
+
     
     func DisplayCamera(){
-        videoCapture.run { sampleBuffer in
-            // ここをDispatchQueue.main.asyncにしてしまえば、リアルタイム感は増すが、
-            // ライブビデオ映像のクオリティはデバイススペックに依存する。
-            // DispatchQueue.global(qos: .userInteractive).asyncだと、比較的滑らかな映像だが、
-            // デバイススペックが低いと反応が遅くリアルタイムな通信感はなくなる。
+        videoCapture.run { sampleBuffer in 
             DispatchQueue.global().async { // (qos: .userInteractive)
-                if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer) {
+                if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
                     DispatchQueue.main.sync {
                         mpcSession.send(imageData: imageData)
                     }
@@ -74,13 +97,12 @@ struct ContentView: View {
 //    guard let cgImage = ciContext.createCGImage(ciImage, from: ciImage.extent) else { return }
 //    let image = UIImage(cgImage: cgImage)
     
-    func GetUIImageDataFromSampleBuffer(_ sampleBuffer: CMSampleBuffer) -> Data? {
+    func GetUIImageDataFromSampleBuffer(_ sampleBuffer: CMSampleBuffer, _ context: CIContext) -> Data? {
         if let pixelBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
             let ciImage = CIImage(cvPixelBuffer: pixelBuffer) // Heavy Process .resize(to: 0.5) -> change size
 //            let imageRect = CGRect(x: 0, y: 0,
 //                                   width: CVPixelBufferGetWidth(pixelBuffer),
 //                                   height: CVPixelBufferGetHeight(pixelBuffer))
-            let context = CIContext()
             if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) { //imageRectが２つ目の引数に入れられる
                 let uiImage = UIImage(cgImage: cgImage)
                 let imageData = uiImage.jpegData(compressionQuality: 0.1)

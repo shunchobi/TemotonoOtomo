@@ -21,10 +21,10 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     private let log = Logger()
 
     @Published var connectedPeers: [MCPeerID] = []
-    
-    // test Date proparty
     @Published var currentScreenImage: UIImage? = nil
     
+    @Published var sendCount = 0
+    @Published var recivedCoount = 0
 
     override init() {
         precondition(Thread.isMainThread)
@@ -47,7 +47,6 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
         self.serviceBrowser.stopBrowsingForPeers()
     }
 
-    
     ///
     /// Advertiser はViewからここで入力値を受け取る
     ///
@@ -55,10 +54,14 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
         precondition(Thread.isMainThread)
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
+            sendCount += 1
+            Timer.get()
         } catch {
             log.error("Error for sending: \(String(describing: error))")
         }
     }
+    
+   
 }
 
 
@@ -141,9 +144,13 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        DispatchQueue.main.async {
-            if let image = UIImage(data: data){
-                self.currentScreenImage = image
+            DispatchQueue.main.async {
+                print("recived")
+                self.recivedCoount += 1
+                print(self.recivedCoount)
+                Timer.get()
+                if let image = UIImage(data: data){
+                    self.currentScreenImage = image
             }
         }
     }
