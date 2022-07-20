@@ -54,6 +54,7 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
         precondition(Thread.isMainThread)
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
+            Communicater.sent = true
             sendCount += 1
             Timer.get()
         } catch {
@@ -151,6 +152,7 @@ extension MPCSession: MCSessionDelegate {
                 Timer.get()
                 if let image = UIImage(data: data){
                     self.currentScreenImage = image
+                    Communicater.sent = false
             }
         }
     }

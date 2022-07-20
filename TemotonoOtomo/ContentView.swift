@@ -19,8 +19,9 @@ extension CIImage{
     }
 }
 
-class AsyncToggle{
-    static var asyncISWorking = false
+class Communicater{
+    static var sent = false
+//    static var recived = false
 }
 
 class Timer{
@@ -69,9 +70,9 @@ struct ContentView: View {
                     DisplayCamera()
                 }
                 
-                Text(String("sent count: \(mpcSession.sendCount)"))
-                Text(String("recived count: \(mpcSession.recivedCoount)"))
-                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+//                Text(String("sent count: \(mpcSession.sendCount)"))
+//                Text(String("recived count: \(mpcSession.recivedCoount)"))
+//                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
 
             }
             .font(.largeTitle)
@@ -117,7 +118,7 @@ struct ContentView: View {
     
     func GetStringAsConveredSampleBufferImage(_ sampleBuffer: CMSampleBuffer) -> String? {
         let imageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer)
-        CVPixelBufferLockBaseAddress(imageBuffer!, CVPixelBufferLockFlags(rawValue: 0))
+//        CVPixelBufferLockBaseAddress(imageBuffer!, CVPixelBufferLockFlags(rawValue: 0))
         let bytesPerRow = CVPixelBufferGetBytesPerRow(imageBuffer!)
         let height = CVPixelBufferGetHeight(imageBuffer!)
         let src_buff = CVPixelBufferGetBaseAddress(imageBuffer!)

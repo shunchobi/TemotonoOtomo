@@ -96,7 +96,9 @@ class VideoCapture: NSObject {
 extension VideoCapture: AVCaptureVideoDataOutputSampleBufferDelegate {
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
         if let handler = handler {
-            handler(sampleBuffer) // Heavy Process
+            if !Communicater.sent {
+                handler(sampleBuffer) // Heavy Process
+            }
         }
     }
 }
