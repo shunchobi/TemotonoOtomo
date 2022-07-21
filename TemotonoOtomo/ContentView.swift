@@ -70,9 +70,9 @@ struct ContentView: View {
                     DisplayCamera()
                 }
                 
-//                Text(String("sent count: \(mpcSession.sendCount)"))
-//                Text(String("recived count: \(mpcSession.recivedCoount)"))
-//                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+                Text(String("sent count: \(mpcSession.sendCount)"))
+                Text(String("recived count: \(mpcSession.recivedCoount)"))
+                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
 
             }
             .font(.largeTitle)
@@ -82,7 +82,7 @@ struct ContentView: View {
 
     
     func DisplayCamera(){
-        videoCapture.run { sampleBuffer in 
+        videoCapture.run { sampleBuffer in
             DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
                     DispatchQueue.main.sync {

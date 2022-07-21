@@ -54,9 +54,7 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
         precondition(Thread.isMainThread)
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
-            Communicater.sent = true
-            sendCount += 1
-            Timer.get()
+            self.sendCount += 1
         } catch {
             log.error("Error for sending: \(String(describing: error))")
         }
@@ -145,16 +143,22 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-            DispatchQueue.main.async {
-                print("recived")
-                self.recivedCoount += 1
-                print(self.recivedCoount)
-                Timer.get()
-                if let image = UIImage(data: data){
+        DispatchQueue.global().async { // 3分で1039回送信
+            if let image = UIImage(data: data){
+                DispatchQueue.main.sync {
                     self.currentScreenImage = image
+                    self.recivedCoount += 1
                     Communicater.sent = false
+                }
             }
         }
+//            DispatchQueue.main.async {　// 3分で927回送信
+//                if let image = UIImage(data: data){
+//                    self.currentScreenImage = image
+//                    self.recivedCoount += 1
+//                    Communicater.sent = false
+//            }
+//        }
     }
         
 //    func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
