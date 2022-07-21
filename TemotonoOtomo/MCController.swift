@@ -24,8 +24,8 @@ class ArrayManager{
     func getLast() -> Any? {
         if let lastContent = array.last{
             array.removeLast()
-            if array.count >= 1 {
-                array.removeAll()
+            if array.count >= 100 {
+                array.removeAll(keepingCapacity: true)
             }
             return lastContent
         }
@@ -34,6 +34,10 @@ class ArrayManager{
     
     func getCount() -> Int{
         return array.count
+    }
+    
+    func removeAll(){
+        array.removeAll(keepingCapacity: true)
     }
 }
 
@@ -68,9 +72,17 @@ class DataController{
     func getArrayCount() -> Int{
         return array.getCount()
     }
+    
+    func removeAllArrayContents(){
+        array.removeAll()
+    }
 }
 
 // DataController.getImage()
+
+
+
+
 
 class MPCSession: NSObject, ObservableObject, StreamDelegate {
     private let serviceType = "example-color"
@@ -90,6 +102,8 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     @Published var sendCount = 0
     @Published var recivedCoount = 0
     @Published var dataArrayCount = 0
+    @Published var streamCountNum = 0
+
 
 
     override init() {
@@ -125,6 +139,13 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
         } catch {
             log.error("Error for sending: \(String(describing: error))")
         }
+        
+//        do {
+//            try session.startStream(withName: String(self.sendCount), toPeer: session.connectedPeers.first!)
+//            print("send stream")
+//        } catch {
+//            log.error("Error for stream: \(String(describing: error))")
+//        }
     }
     
    
@@ -182,18 +203,21 @@ extension MPCSession: MCSessionDelegate {
     /// startStream メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive stream: InputStream, withName streamName: String, fromPeer peerID: MCPeerID) {
-//        precondition(Thread.isMainThread)
         print("recived streamName data")
         stream.delegate = self
         stream.schedule(in: .main, forMode: RunLoop.Mode.default)
         stream.open()
         
-        print("recived streamName data")
-        if let imageData = Data(base64Encoded: streamName, options: []) {
-            print("success encode streanName to data")
-            let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
-            self.currentScreenImage = image
+        DispatchQueue.main.sync {
+            self.streamCountNum = Int(streamName) ?? 777
         }
+        
+//        print("recived streamName data")
+//        if let imageData = Data(base64Encoded: streamName, options: []) {
+//            print("success encode streanName to data")
+//            let image = UIImage(data: imageData, scale: 0.1) // --> これを表示する
+//            self.currentScreenImage = image
+//        }
 
 //        var data:Data?
 //        let bufferSize = 1024
@@ -211,20 +235,18 @@ extension MPCSession: MCSessionDelegate {
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
         self.dataController.addData(data)
-        DispatchQueue.global().async {
+        DispatchQueue.main.async {
             if let image = self.dataController.getImage() {
-                DispatchQueue.main.sync {
+//                self.dataController.removeAllArrayContents()
+//                DispatchQueue.main.sync {
                     self.currentScreenImage = image
                     self.recivedCoount += 1
                     self.dataArrayCount = self.dataController.getArrayCount()
-//                    Communicater.sent = false
                 }
-            }else{
-                return
             }
-        }
+    
         
-        
+
         
 //        DispatchQueue.global().async { // 3分で1039回送信
 //            if let image = UIImage(data: data){

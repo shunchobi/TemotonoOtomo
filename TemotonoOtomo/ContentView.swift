@@ -78,6 +78,7 @@ struct ContentView: View {
                 Text(String("recived count: \(mpcSession.recivedCoount)"))
                 Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
                 Text(String("array count: \(mpcSession.dataArrayCount)"))
+                Text(String("stream count: \(mpcSession.streamCountNum)"))
 
 
             }
@@ -105,8 +106,8 @@ struct ContentView: View {
 //    let image = UIImage(cgImage: cgImage)
     
     func GetUIImageDataFromSampleBuffer(_ sampleBuffer: CMSampleBuffer, _ context: CIContext) -> Data? {
-        if let pixelBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
-            let ciImage = CIImage(cvPixelBuffer: pixelBuffer) // Heavy Process .resize(to: 0.5) -> change size
+        if let cvImageBuffer: CVImageBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) {
+            let ciImage: CIImage = CIImage(cvImageBuffer: cvImageBuffer) // Heavy Process .resize(to: 0.5) -> change size
 //            let imageRect = CGRect(x: 0, y: 0,
 //                                   width: CVPixelBufferGetWidth(pixelBuffer),
 //                                   height: CVPixelBufferGetHeight(pixelBuffer))
