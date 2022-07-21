@@ -132,24 +132,13 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     /// Advertiser はViewからここで入力値を受け取る
     ///
     func send(imageData: Data) { // Data
-//        precondition(Thread.isMainThread)
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
-            
 //            self.sendCount += 1
         } catch {
             log.error("Error for sending: \(String(describing: error))")
         }
-        
-//        do {
-//            try session.startStream(withName: String(self.sendCount), toPeer: session.connectedPeers.first!)
-//            print("send stream")
-//        } catch {
-//            log.error("Error for stream: \(String(describing: error))")
-//        }
     }
-    
-   
 }
 
 
@@ -235,6 +224,9 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
+        
+//        DispatchQueue(label: "net.sambaiz.concurrent_dispatch_queue", attributes: .concurrent).async {}
+        
 //        self.dataController.addData(data)
         DispatchQueue.main.async {
             if let image = UIImage(data: data){

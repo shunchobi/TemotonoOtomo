@@ -90,13 +90,13 @@ struct ContentView: View {
     
     func DisplayCamera(){
         videoCapture.run { sampleBuffer in
-            DispatchQueue.global().async { // (qos: .userInteractive)
+//            DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
 //                    DispatchQueue.main.sync {
                         mpcSession.send(imageData: imageData)
 //                    }
                 }
-            }
+//            }
         }
     }
     
