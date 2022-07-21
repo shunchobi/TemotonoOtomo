@@ -34,18 +34,22 @@ class Timer{
     }
 }
 
-class CommunicateCount: ObservableObject{
-    @Published var sentCount: Int = 0
-    @Published var recivedCount: Int = 0
-
-    func addSent(){
-        sentCount += 1
-        print(sentCount)
-    }
-    func addRecived(){
-        recivedCount += 1
-    }
-}
+//class CommunicateCount: ObservableObject{
+//    @Published var sentCount: Int = 0
+//    @Published var recivedCount: Int = 0
+//    @Published var dataArrayCount: Int = 0
+//
+//    func addSent(){
+//        sentCount += 1
+//        print(sentCount)
+//    }
+//    func addRecived(){
+//        recivedCount += 1
+//    }
+//    func changeArrayCount(countNum: Int){
+//        dataArrayCount = countNum
+//    }
+//}
 
 
 struct ContentView: View {
@@ -56,7 +60,7 @@ struct ContentView: View {
     
     var context = CIContext(options: nil)
 
-    @ObservedObject var communicateCount = CommunicateCount()
+//    @ObservedObject var communicateCount = CommunicateCount()
     
     var body: some View {
         VStack {
@@ -73,6 +77,8 @@ struct ContentView: View {
                 Text(String("sent count: \(mpcSession.sendCount)"))
                 Text(String("recived count: \(mpcSession.recivedCoount)"))
                 Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+                Text(String("array count: \(mpcSession.dataArrayCount)"))
+
 
             }
             .font(.largeTitle)

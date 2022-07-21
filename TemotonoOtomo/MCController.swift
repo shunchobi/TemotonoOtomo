@@ -9,7 +9,68 @@ import Foundation
 import MultipeerConnectivity
 import os
 
+class ArrayManager{
+    // array generate, func add, func delete, func get
+    var array: [Any?]
+    
+    init(){
+        array = []
+    }
+    
+    func addToLast(_ contant: Any){
+        array.append(contant)
+    }
+    
+    func getLast() -> Any? {
+        if let lastContent = array.last{
+            array.removeLast()
+            if array.count >= 1 {
+                array.removeAll()
+            }
+            return lastContent
+        }
+        return nil
+    }
+    
+    func getCount() -> Int{
+        return array.count
+    }
+}
 
+class DataController{
+    // func get data, func data to UIImage -> UIImage,
+    private let array: ArrayManager
+    
+    init(){
+        array = ArrayManager()
+    }
+    
+    func addData(_ data: Data){
+        array.addToLast(data)
+    }
+    
+    func getData() -> Data?{
+        if let targetData = array.getLast(){
+            return targetData as? Data
+        }
+        return nil
+    }
+
+    
+    func getImage() -> UIImage?{
+        if let data = getData(){
+            let UIImage = UIImage(data: data)
+            return UIImage
+        }
+        return nil
+    }
+    
+    func getArrayCount() -> Int{
+        return array.getCount()
+    }
+}
+
+// DataController.getImage()
 
 class MPCSession: NSObject, ObservableObject, StreamDelegate {
     private let serviceType = "example-color"
@@ -23,15 +84,21 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     @Published var connectedPeers: [MCPeerID] = []
     @Published var currentScreenImage: UIImage? = nil
     
+    var dataController: DataController
+    
+    
     @Published var sendCount = 0
     @Published var recivedCoount = 0
+    @Published var dataArrayCount = 0
+
 
     override init() {
         precondition(Thread.isMainThread)
         self.session = MCSession(peer: myPeerId)
         self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
         self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
-
+        self.dataController = DataController()
+        print("DataController init")
         super.init()
 
         session.delegate = self
@@ -143,15 +210,32 @@ extension MPCSession: MCSessionDelegate {
     /// send メソッドから送られてきたDataをここで受け取る
     ///
     func session(_ session: MCSession, didReceive data: Data, fromPeer peerID: MCPeerID) {
-        DispatchQueue.global().async { // 3分で1039回送信
-            if let image = UIImage(data: data){
+        self.dataController.addData(data)
+        DispatchQueue.global().async {
+            if let image = self.dataController.getImage() {
                 DispatchQueue.main.sync {
                     self.currentScreenImage = image
                     self.recivedCoount += 1
-                    Communicater.sent = false
+                    self.dataArrayCount = self.dataController.getArrayCount()
+//                    Communicater.sent = false
                 }
+            }else{
+                return
             }
         }
+        
+        
+        
+//        DispatchQueue.global().async { // 3分で1039回送信
+//            if let image = UIImage(data: data){
+//                DispatchQueue.main.sync {
+//                    self.currentScreenImage = image
+//                    self.recivedCoount += 1
+//                    Communicater.sent = false
+//                }
+//            }
+//        }
+//
 //            DispatchQueue.main.async {　// 3分で927回送信
 //                if let image = UIImage(data: data){
 //                    self.currentScreenImage = image
