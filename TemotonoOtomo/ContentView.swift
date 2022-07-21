@@ -92,9 +92,9 @@ struct ContentView: View {
         videoCapture.run { sampleBuffer in
             DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
-                    DispatchQueue.main.sync {
+//                    DispatchQueue.main.sync {
                         mpcSession.send(imageData: imageData)
-                    }
+//                    }
                 }
             }
         }
