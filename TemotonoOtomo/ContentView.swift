@@ -6,7 +6,7 @@ import AVFoundation
 import Foundation
 
 
-
+// test for pull
 extension CIImage{
     func resize(to scale: CGFloat) -> CIImage?{
         guard let filter = CIFilter(name: "CILanczosScaleTransform") else{
@@ -93,8 +93,8 @@ struct ContentView: View {
 //            DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
 //                    DispatchQueue.main.sync {
-                        mpcSession.send(imageData: imageData)
-//                    }
+                        mpcSession.send(imageData: imageData) // skgdsgsddfgs
+                    //                    }
                 }
 //            }
         }
@@ -207,8 +207,7 @@ struct ContentView: View {
 //
 //            if let quartzImage = quartzImage {
 //                let image = UIImage(CGImage: quartzImage)
-//                return image
-//            }
+//                return image/            }
 //        }
 //        return nil
 //    }
