@@ -6,8 +6,7 @@ import AVFoundation
 import Foundation
 
 	
-// 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
-// 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
+	
 extension CIImage{
     func resize(to scale: CGFloat) -> CIImage?{
         guard let filter = CIFilter(name: "CILanczosScaleTransform") else{
@@ -75,11 +74,11 @@ struct ContentView: View {
                     DisplayCamera()
                 }
                 
-                Text(String("sent count: \(mpcSession.sendCount)"))
-                Text(String("recived count: \(mpcSession.recivedCoount)"))
-                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
-                Text(String("array count: \(mpcSession.dataArrayCount)"))
-                Text(String("stream count: \(mpcSession.streamCountNum)"))
+//                Text(String("sent count: \(mpcSession.sendCount)"))
+//                Text(String("recived count: \(mpcSession.recivedCoount)"))
+//                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+//                Text(String("array count: \(mpcSession.dataArrayCount)"))
+//                Text(String("stream count: \(mpcSession.streamCountNum)"))
 
 
             }

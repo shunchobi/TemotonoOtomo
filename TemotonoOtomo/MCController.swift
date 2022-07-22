@@ -99,20 +99,19 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     var dataController: DataController
     
     
-    @Published var sendCount = 0
-    @Published var recivedCoount = 0
-    @Published var dataArrayCount = 0
-    @Published var streamCountNum = 0
+//    @Published var sendCount = 0
+//    @Published var recivedCoount = 0
+//    @Published var dataArrayCount = 0
+//    @Published var streamCountNum = 0
 
 
 
     override init() {
-        precondition(Thread.isMainThread)
-        self.session = MCSession(peer: myPeerId)
-        self.serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType)
-        self.serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType)
-        self.dataController = DataController()
-        print("DataController init")
+//        precondition(Thread.isMainThread)
+        session = MCSession(peer: myPeerId) // 接続を開く
+        serviceAdvertiser = MCNearbyServiceAdvertiser(peer: myPeerId, discoveryInfo: nil, serviceType: serviceType) // 探してもらう
+        serviceBrowser = MCNearbyServiceBrowser(peer: myPeerId, serviceType: serviceType) // 探す
+        dataController = DataController()
         super.init()
 
         session.delegate = self
@@ -198,9 +197,9 @@ extension MPCSession: MCSessionDelegate {
         stream.schedule(in: .main, forMode: RunLoop.Mode.default)
         stream.open()
         
-        DispatchQueue.main.sync {
-            self.streamCountNum = Int(streamName) ?? 777
-        }
+//        DispatchQueue.main.sync {
+//            self.streamCountNum = Int(streamName) ?? 777
+//        }
         
 //        print("recived streamName data")
 //        if let imageData = Data(base64Encoded: streamName, options: []) {
@@ -234,8 +233,8 @@ extension MPCSession: MCSessionDelegate {
 //                self.dataController.removeAllArrayContents()
 //                DispatchQueue.main.sync {
                     self.currentScreenImage = image
-                    self.recivedCoount += 1
-                    self.dataArrayCount = self.dataController.getArrayCount()
+//                    self.recivedCoount += 1
+//                    self.dataArrayCount = self.dataController.getArrayCount()
                 }
             }
     
