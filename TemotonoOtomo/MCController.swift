@@ -133,7 +133,7 @@ class MPCSession: NSObject, ObservableObject, StreamDelegate {
     func send(imageData: Data) { // Data
         do {
             try session.send(imageData, toPeers: session.connectedPeers, with: .unreliable)
-//            self.sendCount += 1
+            Counter.sentCont += 1
         } catch {
             log.error("Error for sending: \(String(describing: error))")
         }
@@ -228,12 +228,22 @@ extension MPCSession: MCSessionDelegate {
         
 //        self.dataController.addData(data)
         DispatchQueue.main.async {
-            if let image = UIImage(data: data){
+            
+            let message = Message(data: data)
+            let imageData = message.image
+            let partnersRecivedCount = message.receivedCount
+            Counter.partnersRecivedCount = Int(partnersRecivedCount)
+            Counter.delta = abs(Counter.sentCont - Counter.partnersRecivedCount)
+            Counter.recivedCount += 1
+            
+            if let image = UIImage(data: imageData){
+                
 //            if let image = self.dataController.getImage() {
 //                self.dataController.removeAllArrayContents()
 //                DispatchQueue.main.sync {
                     self.currentScreenImage = image
-//                    self.recivedCoount += 1
+                
+                    
 //                    self.dataArrayCount = self.dataController.getArrayCount()
                 }
             }

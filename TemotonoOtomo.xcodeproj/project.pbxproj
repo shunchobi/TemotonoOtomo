@@ -12,6 +12,7 @@
 		2485DBDB28767506006F26F2 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2485DBDA28767506006F26F2 /* Assets.xcassets */; };
 		2485DBDE28767506006F26F2 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 2485DBDD28767506006F26F2 /* Preview Assets.xcassets */; };
 		2485DBE528767557006F26F2 /* VideoCapture.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2485DBE428767557006F26F2 /* VideoCapture.swift */; };
+		24A5A819288E5E8E003E90D6 /* Message.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24A5A818288E5E8E003E90D6 /* Message.swift */; };
 		24AB3785287677EB00F63D89 /* MCController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24AB3784287677EB00F63D89 /* MCController.swift */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,7 @@
 		2485DBDD28767506006F26F2 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		2485DBE428767557006F26F2 /* VideoCapture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VideoCapture.swift; sourceTree = "<group>"; };
 		2485DBE628767755006F26F2 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		24A5A818288E5E8E003E90D6 /* Message.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Message.swift; sourceTree = "<group>"; };
 		24AB3784287677EB00F63D89 /* MCController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MCController.swift; sourceTree = "<group>"; };
 		24AB3834287D62A600F63D89 /* TemotonoOtomo.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = TemotonoOtomo.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -63,6 +65,7 @@
 				2485DBE428767557006F26F2 /* VideoCapture.swift */,
 				2485DBD828767505006F26F2 /* ContentView.swift */,
 				24AB3784287677EB00F63D89 /* MCController.swift */,
+				24A5A818288E5E8E003E90D6 /* Message.swift */,
 				2485DBDA28767506006F26F2 /* Assets.xcassets */,
 				2485DBDC28767506006F26F2 /* Preview Content */,
 			);
@@ -149,6 +152,7 @@
 			files = (
 				2485DBD928767505006F26F2 /* ContentView.swift in Sources */,
 				24AB3785287677EB00F63D89 /* MCController.swift in Sources */,
+				24A5A819288E5E8E003E90D6 /* Message.swift in Sources */,
 				2485DBE528767557006F26F2 /* VideoCapture.swift in Sources */,
 				2485DBD728767505006F26F2 /* TemotonoOtomoApp.swift in Sources */,
 			);
@@ -297,7 +301,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -336,7 +340,7 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.6;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.4;
 				"IPHONEOS_DEPLOYMENT_TARGET[sdk=macosx*]" = 15.4;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

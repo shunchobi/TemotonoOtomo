@@ -25,13 +25,21 @@ class Communicater{
 }
 
 class Timer{
-    static func get(){
+    static func get() -> String{
         let date = Date()
         let dateFormatter = DateFormatter()
-        dateFormatter.timeStyle = .full
+        dateFormatter.timeStyle = .long
         let a = dateFormatter.string(from: date)
-        print(a)
+        return a
     }
+}
+
+
+class Counter{
+    static var sentCont = 0
+    static var recivedCount = 0
+    static var partnersRecivedCount = 0
+    static var delta = 0
 }
 
 //class CommunicateCount: ObservableObject{
@@ -57,6 +65,7 @@ struct ContentView: View {
     @StateObject var mpcSession: MPCSession = MPCSession()
     let videoCapture = VideoCapture()
     @State var image: UIImage? = nil
+    @State var time = ""
     
     var context = CIContext(options: nil)
 
@@ -73,10 +82,10 @@ struct ContentView: View {
                 Button("share\nscreen") {
                     DisplayCamera()
                 }
-                
-//                Text(String("sent count: \(mpcSession.sendCount)"))
-//                Text(String("recived count: \(mpcSession.recivedCoount)"))
-//                Text(String("delta count: \(mpcSession.sendCount - mpcSession.recivedCoount)"))
+                Text(time)
+                Text(String("sent count: \(Counter.sentCont)"))
+                Text(String("recived count: \(Counter.partnersRecivedCount)"))
+                Text(String("delta count: \(Counter.delta)"))
 //                Text(String("array count: \(mpcSession.dataArrayCount)"))
 //                Text(String("stream count: \(mpcSession.streamCountNum)"))
 
@@ -89,7 +98,9 @@ struct ContentView: View {
 
     
     func DisplayCamera(){
+        videoCapture.sending = true
         videoCapture.run { sampleBuffer in
+//            time = Timer.get()
 //            DispatchQueue.global().async { // (qos: .userInteractive)
                 if let imageData: Data = GetUIImageDataFromSampleBuffer(sampleBuffer, context) {
 //                    DispatchQueue.main.sync {
@@ -114,7 +125,10 @@ struct ContentView: View {
             if let cgImage = context.createCGImage(ciImage, from: ciImage.extent) { //imageRectが２つ目の引数に入れられる
                 let uiImage = UIImage(cgImage: cgImage)
                 let imageData = uiImage.jpegData(compressionQuality: 0.1)
-                return imageData
+                
+                let imageDataWithCount = Message(image: imageData!, sendCount: UInt(Counter.sentCont), receivedCount: UInt(Counter.recivedCount))
+                
+                return imageDataWithCount.toData()
             }
         }
         return nil

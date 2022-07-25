@@ -12,7 +12,8 @@ class VideoCapture: NSObject {
     
     let captureSession = AVCaptureSession()
     var handler: ((CMSampleBuffer) -> Void)?
-
+    
+    var sending = false
 
     override init() {
         super.init()
@@ -94,12 +95,39 @@ class VideoCapture: NSObject {
 }
 
 extension VideoCapture: AVCaptureVideoDataOutputSampleBufferDelegate {
+    
+    
+    
+    func beabletoSent(){
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            self.sending = true
+            self.resetCounterNumber()
+        }
+    }
+    
+    func resetCounterNumber(){
+        Counter.sentCont = 0
+        Counter.recivedCount = 0
+        Counter.partnersRecivedCount = 0
+        Counter.delta = 0
+    }
+    
     func captureOutput(_ output: AVCaptureOutput, didOutput sampleBuffer: CMSampleBuffer, from connection: AVCaptureConnection) {
-//        if !Communicater.sent {
-            if let handler = handler {
-                handler(sampleBuffer) // Heavy Process
-//                Communicater.sent = true
+        if !self.sending{
+            return
+        }
+            
+        if Counter.delta >= 100{
+            self.sending = false
+            beabletoSent()
+        }
+        
+        if let handler = handler {
+            handler(sampleBuffer) // Heavy Process
+            
+            if Counter.sentCont >= 10000{
+                self.resetCounterNumber()
             }
-//        }
+        }
     }
 }
